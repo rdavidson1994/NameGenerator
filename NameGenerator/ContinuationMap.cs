@@ -28,7 +28,10 @@ namespace NameGenerator
             {
                 return counter.GetRandom();
             }
-            return null;
+            throw new GenerationFailedException<T>(
+                $"No continuation found for {start.Symbol()}",
+                this
+                );
         }
     }
 }

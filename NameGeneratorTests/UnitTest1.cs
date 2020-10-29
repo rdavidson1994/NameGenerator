@@ -169,7 +169,7 @@ namespace NameGeneratorTests
             WordGenerator wordGenerator = new WordGenerator();
             Word hello = Word.FromDictionaryLine(dictionaryLine);
             wordGenerator.LearnWord(hello);
-            string generatedOutput = wordGenerator.GenerateName();
+            string generatedOutput = wordGenerator.GenerateName().SymbolizedRuns();
             Assert.AreEqual(expectedOutput, generatedOutput);
         }
 

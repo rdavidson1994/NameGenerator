@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Reflection.Metadata.Ecma335;
 
 namespace NameGenerator
 {
@@ -91,9 +93,9 @@ namespace NameGenerator
             return new GenerationFailedException();
         }
 
-        public string? GenerateName()
+        public Word GenerateName()
         {
-            List<string> parts = new List<string>();
+            List<Run> parts = new List<Run>();
             StressPattern? stressPattern = StressPatterns.GetRandom() ?? throw Fail();
 
             Run onset;
@@ -108,8 +110,8 @@ namespace NameGenerator
                 onset = UnstressedOnsets.GetRandom() ?? throw Fail();
                 firstVowel = UnstressedOnsetToUnstressedVowel.GenerateContinuation(onset) ?? throw Fail();
             }
-            parts.Add(onset.Symbol());
-            parts.Add(firstVowel.Symbol());
+            parts.Add(onset);
+            parts.Add(firstVowel);
 
             Run previousVowel = firstVowel;
 
@@ -144,8 +146,8 @@ namespace NameGenerator
                         .GenerateContinuation(intervocal)
                         ?? throw Fail();
                 }
-                parts.Add(intervocal.Symbol());
-                parts.Add(vowel.Symbol());
+                parts.Add(intervocal);
+                parts.Add(vowel);
                 previousVowel = vowel;
             }
 
@@ -162,8 +164,9 @@ namespace NameGenerator
                     .GenerateContinuation(previousVowel)
                     ?? throw Fail();
             }
-            parts.Add(coda.Symbol());
-            return string.Join('|', parts);
+            parts.Add(coda);
+            string text = string.Join('|', parts.Select(x => x.Symbol()));
+            return new Word(text, parts);
         }      
     }
 }

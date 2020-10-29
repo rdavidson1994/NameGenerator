@@ -42,7 +42,7 @@ namespace NameGenerator
             Console.WriteLine("Generating names:");
             for (int i = 0; i < 100; i++)
             {
-                string? name = wordGenerator.GenerateName();
+                string name = wordGenerator.GenerateName().SymbolizedRuns();
                 Console.WriteLine(name);
                 if (name == null)
                 {
