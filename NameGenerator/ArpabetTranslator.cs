@@ -5,6 +5,28 @@ using System.Text.Json;
 
 namespace NameGenerator
 {
+    public static class JsonUtils
+    {
+        public static Dictionary<string, string> DictionaryFromJsonStream(Stream stream)
+        {
+            Dictionary<string, string> lookupTable = new Dictionary<string, string>();
+            JsonDocument json = JsonDocument.Parse(stream);
+            foreach (var jsonProperty in json.RootElement.EnumerateObject())
+            {
+                lookupTable[jsonProperty.Name] = jsonProperty.Value.GetString();
+            }
+            return lookupTable;
+        }
+
+        public static Dictionary<string, string> DictionaryFromJsonFile(string filePath)
+        {
+            using (var fs = new FileStream(filePath, FileMode.Open, FileAccess.Read))
+            {
+                return DictionaryFromJsonStream(fs);
+            }
+        }
+    }
+
     public class ArpabetTranslator
     {
         private Dictionary<string, string> lookupTable;
@@ -15,14 +37,7 @@ namespace NameGenerator
 
         public static ArpabetTranslator FromStream(Stream stream)
         {
-            Dictionary<string, string> lookupTable = new Dictionary<string, string>();
-
-            JsonDocument json = JsonDocument.Parse(stream);
-            foreach (var jsonProperty in json.RootElement.EnumerateObject())
-            {
-                lookupTable[jsonProperty.Name] = jsonProperty.Value.GetString();
-            }
-            return new ArpabetTranslator(lookupTable);
+            return new ArpabetTranslator(JsonUtils.DictionaryFromJsonStream(stream));
         }
 
         public string TranslateArpabetToIpaXml(string arpabetString)

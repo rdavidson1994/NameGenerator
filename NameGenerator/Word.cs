@@ -20,6 +20,47 @@ namespace NameGenerator
             IEnumerable<string> runSymbols = Runs.Select(run => run.Symbol());
             return string.Join('|', runSymbols);
         }
+
+        public string CreateSpelling(
+            Dictionary<string, string> lookupTable,
+            string separator = "",
+            string primaryStressMarker = "",
+            string secondaryStressMarker = "")
+        {
+            List<string> outputPieces = new List<string>();
+            foreach (Run run in Runs)
+            {
+                foreach (Phone phone in run.Phones)
+                {
+                    string phoneSymbol = phone.Code;
+                    if (phoneSymbol == "")
+                    {
+                        continue;
+                    }
+                    // Add IPA stress marks to account for ARPAbet stress annotations
+                    if (phoneSymbol.EndsWith("1"))
+                    {
+                        outputPieces.Add(primaryStressMarker);
+                    }
+                    else if (phoneSymbol.EndsWith("2"))
+                    {
+                        outputPieces.Add(secondaryStressMarker);
+                    }
+                    // Then trim the stress annotations away
+                    string trimmedSymbol = phoneSymbol.TrimEnd('0', '1', '2');
+                    if (lookupTable.TryGetValue(trimmedSymbol, out string? translatedSymbol))
+                    {
+                        outputPieces.Add(translatedSymbol);
+                    }
+                    else
+                    {
+                        throw new Exception($"Unrecognized symbol {trimmedSymbol}, translation failed.");
+                    }
+                }
+
+            }
+            return string.Join(separator, outputPieces);
+        }
         
         public static Word? FromDictionaryLine(string line)
         {

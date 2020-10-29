@@ -17,6 +17,15 @@ namespace NameGenerator
 
         static void Main(string[] args)
         {
+            int count;
+            if (args.Length == 0)
+            {
+                count = 100;
+            }
+            else
+            {
+                count = Int32.Parse(args[0]);
+            }
             List<Word> words = File.ReadLines(cmuDictFilename)
                 .Select(line => Word.FromDictionaryLine(line))
                 .WhereNotNull()
@@ -37,18 +46,38 @@ namespace NameGenerator
             {
                 translator = ArpabetTranslator.FromStream(fs);
             }
+
+            Dictionary<string, string> spellings = JsonUtils.DictionaryFromJsonFile("arpabet-to-spelling.json");
             //= ArpabetTranslator.FromStream()
 
             Console.WriteLine("Generating names:");
-            for (int i = 0; i < 100; i++)
+            for (int i = 0; i < count; i++)
             {
-                string name = wordGenerator.GenerateName().SymbolizedRuns();
-                Console.WriteLine(name);
-                if (name == null)
+                Word name;
+                int tries = 0;
+                while (true)
                 {
-                    throw new Exception("I messed up");
+                    try
+                    {
+                        name = wordGenerator.GenerateName();
+                        break;
+                    }
+                    catch (GenerationFailedException<Run>)
+                    {
+                        tries++;
+                        if (tries >= 10)
+                        {
+                            // After ten failures in a row, rethrow the exception
+                            throw;
+                        }
+                    }
                 }
-                string ipaName = translator.TranslateArpabetToIpaXml(name);
+                string arpabetName = name.SymbolizedRuns();
+                string ipaName = translator.TranslateArpabetToIpaXml(name.SymbolizedRuns());
+                string spelledName = name.CreateSpelling(spellings);
+                string spelledNameCapitalized = spelledName.First().ToString().ToUpperInvariant() + spelledName.Substring(1);
+
+                Console.WriteLine($"{spelledNameCapitalized}: {arpabetName}");
                 SayName(ipaName);
             }
 
