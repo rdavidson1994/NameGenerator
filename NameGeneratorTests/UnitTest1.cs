@@ -205,51 +205,51 @@ namespace NameGeneratorTests
 
             Assert.AreEqual(
                 expectedPreStressOnsets,
-                wordGenerator.PreStressOnsets.Count());
+                wordGenerator.OnsetS.Count());
 
             Assert.AreEqual(
                 expectedUnstressedOnsets,
-                wordGenerator.UnstressedOnsets.Count());
+                wordGenerator.OnsetU.Count());
 
             Assert.AreEqual(
                 expectedPreStressOnsetToStressedVowel,
-                wordGenerator.PreStressOnsetToStressedVowel.Count());
+                wordGenerator.OnsetToStressed.Count());
 
             Assert.AreEqual(
                 expectedUnstressedOnsetToUnstressedVowel,
-                wordGenerator.UnstressedOnsetToUnstressedVowel.Count());
+                wordGenerator.OnsetToUnstressed.Count());
 
             Assert.AreEqual(
                 expectedStressedVowelToPostStressIntervocal,
-                wordGenerator.StressedVowelToPostStressIntervocal.Count());
+                wordGenerator.StressedToFalling.Count());
 
             Assert.AreEqual(
                 expectedUnstressedVowelToPreStressIntervocal,
-                wordGenerator.UnstressedVowelToPreStressIntervocal.Count());
+                wordGenerator.UnstressedToRising.Count());
 
             Assert.AreEqual(
                 expectedUnstressedVowelToUnstressedIntervocal,
-                wordGenerator.UnstressedVowelToUnstressedIntervocal.Count());
+                wordGenerator.UnstressedToFlat.Count());
 
             Assert.AreEqual(
                 expectedPostStressIntervocalToUnstressedVowel,
-                wordGenerator.PostStressIntervocalToUnstressedVowel.Count());
+                wordGenerator.FallingToUnstressed.Count());
 
             Assert.AreEqual(
                 expectedUnstressedIntervocalToUnstressedVowel,
-                wordGenerator.UnstressedIntervocalToUnstressedVowel.Count());
+                wordGenerator.FlatToUnstressed.Count());
 
             Assert.AreEqual(
                 expectedPreStressIntervocalToStressedVowel, 
-                wordGenerator.PreStressIntervocalToStressedVowel.Count());
+                wordGenerator.RisingToStressed.Count());
 
             Assert.AreEqual(
                 expectedUnstressedVowelToUnstressedCoda, 
-                wordGenerator.UnstressedVowelToUnstressedCoda.Count());
+                wordGenerator.UnstressedToCoda.Count());
 
             Assert.AreEqual(
                 expectedStressedVowelToPostStressCoda,
-                wordGenerator.StressedVowelToPostStressCoda.Count());
+                wordGenerator.StressedToCoda.Count());
         }
     }
 }

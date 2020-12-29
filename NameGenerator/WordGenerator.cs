@@ -7,24 +7,82 @@ namespace NameGenerator
 {
     public class WordGenerator
     {
+    
+
         public Counter<StressPattern> StressPatterns { get; set; } = new Counter<StressPattern>();
 
-        public Counter<Run> PreStressOnsets { get; set; } = new Counter<Run>();
-        public Counter<Run> UnstressedOnsets { get; set; } = new Counter<Run>();
+        // Vowels are divided into two categories
+        //     Stressed   - Denoted by a 1 in ARPAbet notation
+        //     Unstressed - Denoted by any other number in ARPAbet notation
+        
+        // Words contain exactly one stressed vowel.
 
-        public ContinuationMap<Run> PreStressOnsetToStressedVowel { get; set; } = new ContinuationMap<Run>();
-        public ContinuationMap<Run> UnstressedOnsetToUnstressedVowel { get; set; } = new ContinuationMap<Run>();
+        // Intervocals are sequences of consonants between vowels. They are divided into three
+        // categories:
+        //     Rising  - Occurs just before a stressed vowel (and after an unstressed one).
+        //     Falling - Occurs just after a stressed vowel (and after a stressed one).
+        //     Flat    - Occurs betwen two unstressed vowel.
 
-        public ContinuationMap<Run> UnstressedVowelToPreStressIntervocal { get; set; } = new ContinuationMap<Run>();
-        public ContinuationMap<Run> UnstressedVowelToUnstressedIntervocal { get; set; } = new ContinuationMap<Run>();
-        public ContinuationMap<Run> StressedVowelToPostStressIntervocal { get; set; } = new ContinuationMap<Run>();
+        /// <summary>
+        /// Onsets which precede stressed syllables
+        /// </summary>
+        public Counter<Run> OnsetS { get; set; } = new Counter<Run>();
 
-        public ContinuationMap<Run> PreStressIntervocalToStressedVowel { get; set; } = new ContinuationMap<Run>();
-        public ContinuationMap<Run> PostStressIntervocalToUnstressedVowel { get; set; } = new ContinuationMap<Run>();
-        public ContinuationMap<Run> UnstressedIntervocalToUnstressedVowel { get; set; } = new ContinuationMap<Run>();
+        /// <summary>
+        /// Onsets which precede unstressed syllables
+        /// </summary>
+        public Counter<Run> OnsetU { get; set; } = new Counter<Run>();
 
-        public ContinuationMap<Run> StressedVowelToPostStressCoda { get; set; } = new ContinuationMap<Run>();
-        public ContinuationMap<Run> UnstressedVowelToUnstressedCoda { get; set; } = new ContinuationMap<Run>();
+        /// <summary>
+        /// Transitions from onsets to stressed vowels
+        /// e.g. PR-AE1 in [PR-AE1]-KT-IH0-S ("practice")
+        /// </summary>
+        public ContinuationMap<Run> OnsetToStressed { get; set; } = new ContinuationMap<Run>();
+        /// <summary>
+        /// Transitions from onsets to unstressed vowels
+        /// e.g. STR-AA0 in STR-AA0-MB-OW1-L-IY0 ("stromboli")
+        /// </summary>
+        public ContinuationMap<Run> OnsetToUnstressed { get; set; } = new ContinuationMap<Run>();
+        /// <summary>
+        /// Transitions from unstressed vowels to intervocal sequences that precede stressed vowels
+        /// e.g. AA0-MB in STR-AA0-MB-OW1-L-IY0 ("stromboli")
+        /// </summary>
+        public ContinuationMap<Run> UnstressedToRising { get; set; } = new ContinuationMap<Run>();
+        /// <summary>
+        /// Transitions from unstressed vowels to intervocal sequences that do not precede stressed vowels.
+        /// e.g. IH0-K in T-AE1-KT-IH0-K-AH0-L ("tactical")
+        /// </summary>
+        public ContinuationMap<Run> UnstressedToFlat { get; set; } = new ContinuationMap<Run>();
+        /// <summary>
+        /// Transitions from stressed vowels to intervocal sequences
+        /// e.g. OW1-L in STR-AA0-MB-OW1-L-IY0 ("stromboli")
+        /// </summary>
+        public ContinuationMap<Run> StressedToFalling { get; set; } = new ContinuationMap<Run>();
+        /// <summary>
+        /// Transitions from intervocal sequences to stressed vowels.
+        /// e.g. MB-OW1 in STR-AA0-MB-OW1-L-IY0 ("stromboli")
+        /// </summary>
+        public ContinuationMap<Run> RisingToStressed { get; set; } = new ContinuationMap<Run>();
+        /// <summary>
+        /// Transitions from intervocals that follow stressed vowels to unstressed vowels.
+        /// e.g. KT-IH0 in T-AE1-KT-IH0-K-AH0-L ("tactical")
+        /// </summary>
+        public ContinuationMap<Run> FallingToUnstressed { get; set; } = new ContinuationMap<Run>();
+        /// <summary>
+        /// Transitions from intervocals that do not follow stressed vowels to unstressed vowels.
+        /// e.g. K-AH0 in T-AE1-KT-IH0-K-AH0-L ("tactical")
+        /// </summary>
+        public ContinuationMap<Run> FlatToUnstressed { get; set; } = new ContinuationMap<Run>();
+        /// <summary>
+        /// Transitions from stressed vowels to codas
+        /// e.g. OW1-K in P-OW1-K ("poke")
+        /// </summary>
+        public ContinuationMap<Run> StressedToCoda { get; set; } = new ContinuationMap<Run>();
+        /// <summary>
+        /// Transitions from unstressed vowels to codas
+        /// AH0-L in T-AE1-KT-IH0-K-AH0-L ("tactical")
+        /// </summary>
+        public ContinuationMap<Run> UnstressedToCoda { get; set; } = new ContinuationMap<Run>();
 
         public bool LearnWord(Word word)
         {
@@ -39,13 +97,13 @@ namespace NameGenerator
 
             if (stressPattern.StressedIndex == 0)
             {
-                PreStressOnsets.Add(word.Runs[0]);
-                PreStressOnsetToStressedVowel.Add(word.Runs[0], word.Runs[1]);
+                OnsetS.Add(word.Runs[0]);
+                OnsetToStressed.Add(word.Runs[0], word.Runs[1]);
             }
             else
             {
-                UnstressedOnsets.Add(word.Runs[0]);
-                UnstressedOnsetToUnstressedVowel.Add(word.Runs[0], word.Runs[1]);
+                OnsetU.Add(word.Runs[0]);
+                OnsetToUnstressed.Add(word.Runs[0], word.Runs[1]);
             }
 
             for (int i = 2;
@@ -57,18 +115,18 @@ namespace NameGenerator
                 Run nextVowel = word.Runs[i + 1];
                 if (previousVowel.HasPrimaryStress())
                 {
-                    StressedVowelToPostStressIntervocal.Add(previousVowel, intervocal);
-                    PostStressIntervocalToUnstressedVowel.Add(intervocal, nextVowel);
+                    StressedToFalling.Add(previousVowel, intervocal);
+                    FallingToUnstressed.Add(intervocal, nextVowel);
                 }
                 else if (nextVowel.HasPrimaryStress())
                 {
-                    UnstressedVowelToPreStressIntervocal.Add(previousVowel, intervocal);
-                    PreStressIntervocalToStressedVowel.Add(intervocal, nextVowel);
+                    UnstressedToRising.Add(previousVowel, intervocal);
+                    RisingToStressed.Add(intervocal, nextVowel);
                 }
                 else
                 {
-                    UnstressedVowelToUnstressedIntervocal.Add(previousVowel, intervocal);
-                    UnstressedIntervocalToUnstressedVowel.Add(intervocal, nextVowel);
+                    UnstressedToFlat.Add(previousVowel, intervocal);
+                    FlatToUnstressed.Add(intervocal, nextVowel);
                 }
             }
 
@@ -77,11 +135,11 @@ namespace NameGenerator
             Run coda = word.Runs[lastIndex];
             if (lastVowel.HasPrimaryStress())
             {
-                StressedVowelToPostStressCoda.Add(lastVowel, coda);
+                StressedToCoda.Add(lastVowel, coda);
             }
             else
             {
-                UnstressedVowelToUnstressedCoda.Add(lastVowel, coda);
+                UnstressedToCoda.Add(lastVowel, coda);
             }
             return true;
         }
@@ -102,13 +160,13 @@ namespace NameGenerator
             Run firstVowel;
             if (stressPattern.StressedIndex == 0)
             {
-                onset = PreStressOnsets.GetRandom() ?? throw Fail();
-                firstVowel = PreStressOnsetToStressedVowel.GenerateContinuation(onset) ?? throw Fail();
+                onset = OnsetS.GetRandom() ?? throw Fail();
+                firstVowel = OnsetToStressed.GenerateContinuation(onset) ?? throw Fail();
             }
             else
             {
-                onset = UnstressedOnsets.GetRandom() ?? throw Fail();
-                firstVowel = UnstressedOnsetToUnstressedVowel.GenerateContinuation(onset) ?? throw Fail();
+                onset = OnsetU.GetRandom() ?? throw Fail();
+                firstVowel = OnsetToUnstressed.GenerateContinuation(onset) ?? throw Fail();
             }
             parts.Add(onset);
             parts.Add(firstVowel);
@@ -121,28 +179,28 @@ namespace NameGenerator
                 Run vowel;
                 if (i == stressPattern.StressedIndex)
                 {
-                    intervocal = UnstressedVowelToPreStressIntervocal
+                    intervocal = UnstressedToRising
                         .GenerateContinuation(previousVowel) 
                         ?? throw Fail();
-                    vowel = PreStressIntervocalToStressedVowel
+                    vowel = RisingToStressed
                         .GenerateContinuation(intervocal)
                         ?? throw Fail();
                 }
                 else if (i - 1 == stressPattern.StressedIndex)
                 {
-                    intervocal = StressedVowelToPostStressIntervocal
+                    intervocal = StressedToFalling
                         .GenerateContinuation(previousVowel)
                         ?? throw Fail();
-                    vowel = PostStressIntervocalToUnstressedVowel
+                    vowel = FallingToUnstressed
                         .GenerateContinuation(intervocal)
                         ?? throw Fail();
                 }
                 else
                 {
-                    intervocal = UnstressedVowelToUnstressedIntervocal
+                    intervocal = UnstressedToFlat
                         .GenerateContinuation(previousVowel)
                         ?? throw Fail();
-                    vowel = UnstressedIntervocalToUnstressedVowel
+                    vowel = FlatToUnstressed
                         .GenerateContinuation(intervocal)
                         ?? throw Fail();
                 }
@@ -154,13 +212,13 @@ namespace NameGenerator
             Run coda;
             if (stressPattern.StressedIndex == stressPattern.Count - 1)
             {
-                coda = StressedVowelToPostStressCoda
+                coda = StressedToCoda
                     .GenerateContinuation(previousVowel)
                     ?? throw Fail();
             }
             else
             {
-                coda = UnstressedVowelToUnstressedCoda
+                coda = UnstressedToCoda
                     .GenerateContinuation(previousVowel)
                     ?? throw Fail();
             }

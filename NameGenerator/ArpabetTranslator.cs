@@ -43,7 +43,7 @@ namespace NameGenerator
         public string TranslateArpabetToIpaXml(string arpabetString)
         {
             string unicodePrimaryStressMark = "&#x2c8;";
-            string unicodeSecondaryStressMark = "&#x2cc;";
+            string unicodeSecondaryStressMark = "";//"&#x2cc;";
             string[] phones = arpabetString.Split('|', '-');
             List<string> outputPieces = new List<string>();
             foreach (string phone in phones)
