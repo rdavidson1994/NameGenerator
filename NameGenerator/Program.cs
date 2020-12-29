@@ -8,7 +8,9 @@ namespace NameGenerator
 {
     public class Program
     {
-        static readonly string cmuDictFilename = @"cmudict-0.7b.txt";
+        //static readonly string cmuDictFilename = @"cmudict-0.7b.txt";
+        static readonly string cmuDictFilename = @"cmu-names.txt";
+        //static readonly string cmuDictFilename = @"just-keanu.txt";
         static void SayName(string name)
         {
             Process process = Process.Start(@"NameSayer.exe", name);
@@ -78,6 +80,7 @@ namespace NameGenerator
                 string spelledNameCapitalized = spelledName.First().ToString().ToUpperInvariant() + spelledName.Substring(1);
 
                 Console.WriteLine($"{spelledNameCapitalized}: {arpabetName}");
+                //Console.WriteLine(ipaName);
                 SayName(ipaName);
             }
 
