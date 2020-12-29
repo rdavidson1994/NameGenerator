@@ -3,14 +3,44 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Diagnostics;
+using CommandLine;
 
 namespace NameGenerator
 {
+    public class CommandLineOptions
+    {
+        [Option("model-input",
+            HelpText="Input .mdl file for pre-trained model.")]
+        public string? ModelInput { get; set; }
+
+        [Option("model-output",
+            HelpText="Output .mdl file for trained model.")]
+        public string? ModelOutput { get; set; }
+
+        [Option("training-input",
+            HelpText="Input .txt file for training corpus.",
+            Default = @"cmu-names.txt")]
+        public string? TrainingInput { get; set; }
+
+        [Option("name-output",
+            HelpText = "Output .txt file for generated names.")]
+        public string? NameOutput { get; set; }
+
+        [Option("speak",
+            HelpText = "Speak generated names aloud via default audio device.",
+            Default = false
+        )]
+        public bool Speak { get; set; }
+
+        [Option("quantity",
+            HelpText = "Number of names to generate.",
+            Default = 1
+        )]
+        public int Quantity { get; set; }
+        
+    }
     public class Program
     {
-        //static readonly string cmuDictFilename = @"cmudict-0.7b.txt";
-        static readonly string cmuDictFilename = @"cmu-names.txt";
-        //static readonly string cmuDictFilename = @"just-keanu.txt";
         static void SayName(string name)
         {
             Process process = Process.Start(@"NameSayer.exe", name);
@@ -19,16 +49,18 @@ namespace NameGenerator
 
         static void Main(string[] args)
         {
-            int count;
-            if (args.Length == 0)
+            Parser.Default
+                .ParseArguments<CommandLineOptions>(args)
+                .WithParsed(ExecuteOptions);
+        }
+
+        static void ExecuteOptions(CommandLineOptions options)
+        {
+            if (options.TrainingInput == null)
             {
-                count = 100;
+                throw new Exception("Training input is required for now.");
             }
-            else
-            {
-                count = Int32.Parse(args[0]);
-            }
-            List<Word> words = File.ReadLines(cmuDictFilename)
+            List<Word> words = File.ReadLines(options.TrainingInput)
                 .Select(line => Word.FromDictionaryLine(line))
                 .WhereNotNull()
                 .ToList();
@@ -53,7 +85,7 @@ namespace NameGenerator
             //= ArpabetTranslator.FromStream()
 
             Console.WriteLine("Generating names:");
-            for (int i = 0; i < count; i++)
+            for (int i = 0; i < options.Quantity; i++)
             {
                 Word name;
                 int tries = 0;
@@ -81,9 +113,11 @@ namespace NameGenerator
 
                 Console.WriteLine($"{spelledNameCapitalized}: {arpabetName}");
                 //Console.WriteLine(ipaName);
-                SayName(ipaName);
+                if (options.Speak)
+                {
+                    SayName(ipaName);
+                }
             }
-
         }
     }
 }
