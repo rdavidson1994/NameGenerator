@@ -38,7 +38,7 @@ namespace NameGenerator
             return Phones.Any(x => x.HasPrimaryStress());
         }
 
-        public IReadOnlyList<Phone> Phones { get; }
+        public List<Phone> Phones { get; }
 
         /// <summary>
         /// Reads a run from the phone list, starting at "index". Index is incremented once for each phone read.

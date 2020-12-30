@@ -1,10 +1,12 @@
 ﻿using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
 namespace NameGenerator
 {
     public class ContinuationMap<T> where T : class, IStringSymbol
     {
         public Dictionary<string, Counter<T>> Data { get; }
+        [JsonConstructor]
         public ContinuationMap(Dictionary<string, Counter<T>> data)
         {
             this.Data = data;
