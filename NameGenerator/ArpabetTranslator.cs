@@ -13,7 +13,12 @@ namespace NameGenerator
             JsonDocument json = JsonDocument.Parse(stream);
             foreach (var jsonProperty in json.RootElement.EnumerateObject())
             {
-                lookupTable[jsonProperty.Name] = jsonProperty.Value.GetString();
+                string? propertyString = jsonProperty.Value.GetString();
+                if (propertyString == null)
+                {
+                    throw new Exception("Unexpected null value in JSON object.");
+                }
+                lookupTable[jsonProperty.Name] = propertyString;
             }
             return lookupTable;
         }

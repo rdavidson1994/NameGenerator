@@ -59,7 +59,8 @@ namespace NameGenerator
         static WordGenerator ImportGenerator(string path)
         {
             string jsonString = File.ReadAllText(path);
-            return JsonSerializer.Deserialize<WordGenerator>(jsonString);
+            return JsonSerializer.Deserialize<WordGenerator>(jsonString)
+                ?? throw new Exception("Failed to decode WordGenerator from JSON.");
         }
         static void SayName(string name)
         {
