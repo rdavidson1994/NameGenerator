@@ -8,60 +8,8 @@ using System.Text.Json;
 
 namespace NameGenerator
 {
-    public class CommandLineOptions
-    {
-        [Option("model-input",
-            HelpText="Input .json file for pre-trained model."
-             ,Default ="model.json"
-        )]
-        public string? ModelInput { get; set; }
-
-        [Option("model-output",
-            HelpText="Output .json file for trained model.",
-            Default ="model.json")]
-        public string? ModelOutput { get; set; }
-
-        [Option("training-input",
-            HelpText="Input .txt file for training corpus.",
-            Default = @"cmu-names.txt")]
-        public string? TrainingInput { get; set; }
-
-        [Option("spelling-input",
-            HelpText = "Input .json file for ARPAbet to glyph translation",
-            Default = "arpabet-to-spelling.json")]
-        public string? SpellingInput { get; set; }
-
-        [Option("name-output",
-            HelpText = "Output .txt file for generated names.")]
-        public string? NameOutput { get; set; }
-
-        [Option("speak",
-            HelpText = "Speak generated names aloud via default audio device.",
-            Default = false
-        )]
-        public bool Speak { get; set; }
-
-        [Option("quantity",
-            HelpText = "Number of names to generate.",
-            Default = 1
-        )]
-        public int Quantity { get; set; }
-        
-    }
     public class Program
     {
-        static void ExportGenerator(WordGenerator generator, string path)
-        {
-            string jsonString = JsonSerializer.Serialize(generator);
-            File.WriteAllText(path, jsonString);
-        }
-
-        static WordGenerator ImportGenerator(string path)
-        {
-            string jsonString = File.ReadAllText(path);
-            return JsonSerializer.Deserialize<WordGenerator>(jsonString)
-                ?? throw new Exception("Failed to decode WordGenerator from JSON.");
-        }
         static void SayName(string name)
         {
             Process process = Process.Start(@"NameSayer.exe", name);
@@ -81,7 +29,8 @@ namespace NameGenerator
             if (options.ModelInput != null && File.Exists(options.ModelInput))
             {
                 Console.WriteLine("Importing WordGenerator from file...");
-                wordGenerator = ImportGenerator(options.ModelInput);
+                string jsonString = File.ReadAllText(options.ModelInput);
+                wordGenerator = WordGenerator.ImportFromJson(jsonString);
             }
             else if (options.TrainingInput != null)
             {
@@ -99,7 +48,7 @@ namespace NameGenerator
                 Console.WriteLine($"Done! Read {words.Count} words from dictionary.");
                 if (options.ModelOutput != null)
                 {
-                    ExportGenerator(wordGenerator, options.ModelOutput);
+                    File.WriteAllText(options.ModelOutput, wordGenerator.ToJson());
                 }
             }
             else
@@ -121,25 +70,7 @@ namespace NameGenerator
             Console.WriteLine("Generating names:");
             for (int i = 0; i < options.Quantity; i++)
             {
-                Word name;
-                int tries = 0;
-                while (true)
-                {
-                    try
-                    {
-                        name = wordGenerator.GenerateName();
-                        break;
-                    }
-                    catch (GenerationFailedException<Run>)
-                    {
-                        tries++;
-                        if (tries >= 10)
-                        {
-                            // After ten failures in a row, rethrow the exception
-                            throw;
-                        }
-                    }
-                }
+                Word name = TryGenerationUntilSuccessful(wordGenerator, maxTries: 10);
                 string arpabetName = name.SymbolizedRuns();
                 string ipaName = translator.TranslateArpabetToIpaXml(name.SymbolizedRuns());
                 string spelledName = name.CreateSpelling(spellings);
@@ -152,6 +83,31 @@ namespace NameGenerator
                     SayName(ipaName);
                 }
             }
+        }
+
+        private static Word TryGenerationUntilSuccessful(WordGenerator wordGenerator, int maxTries)
+        {
+            Word name;
+            int tries = 0;
+            while (true)
+            {
+                try
+                {
+                    name = wordGenerator.GenerateWord();
+                    break;
+                }
+                catch (WordGenerator.GenerationFailedException)
+                {
+                    tries++;
+                    if (tries >= maxTries)
+                    {
+                        // After ten failures in a row, rethrow the exception
+                        throw;
+                    }
+                }
+            }
+
+            return name;
         }
     }
 }

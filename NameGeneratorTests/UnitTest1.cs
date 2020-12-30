@@ -169,7 +169,7 @@ namespace NameGeneratorTests
             WordGenerator wordGenerator = new WordGenerator();
             Word hello = Word.FromDictionaryLine(dictionaryLine);
             wordGenerator.LearnWord(hello);
-            string generatedOutput = wordGenerator.GenerateName().SymbolizedRuns();
+            string generatedOutput = wordGenerator.GenerateWord().SymbolizedRuns();
             Assert.AreEqual(expectedOutput, generatedOutput);
         }
 
@@ -205,11 +205,11 @@ namespace NameGeneratorTests
 
             Assert.AreEqual(
                 expectedPreStressOnsets,
-                wordGenerator.OnsetS.Count());
+                wordGenerator.StressedOnset.Count());
 
             Assert.AreEqual(
                 expectedUnstressedOnsets,
-                wordGenerator.OnsetU.Count());
+                wordGenerator.UnstressedOnset.Count());
 
             Assert.AreEqual(
                 expectedPreStressOnsetToStressedVowel,

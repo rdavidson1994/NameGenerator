@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection.Metadata.Ecma335;
+using System.Text.Json;
 
 namespace NameGenerator
 {
@@ -14,7 +15,7 @@ namespace NameGenerator
         // Vowels are divided into two categories
         //     Stressed   - Denoted by a 1 in ARPAbet notation
         //     Unstressed - Denoted by any other number in ARPAbet notation
-        
+
         // Words contain exactly one stressed vowel.
 
         // Intervocals are sequences of consonants between vowels. They are divided into three
@@ -24,66 +25,108 @@ namespace NameGenerator
         //     Flat    - Occurs betwen two unstressed vowel.
 
         /// <summary>
-        /// Onsets which precede stressed syllables
+        /// Onsets (word-initial consonant clusters) which precede stressed syllables
+        /// e.g. PR in PR-AE1-KT-IH0-S ("practice")
         /// </summary>
-        public Counter<Run> OnsetS { get; set; } = new Counter<Run>();
+        public Counter<Run> StressedOnset { get; set; } = new Counter<Run>();
 
         /// <summary>
-        /// Onsets which precede unstressed syllables
+        /// Onsets (word-initial consonant clusters) which precede unstressed syllables
+        /// e.g. STR in STR-AA0-MB-OW1-L-IY0 ("stromboli")
         /// </summary>
-        public Counter<Run> OnsetU { get; set; } = new Counter<Run>();
+        public Counter<Run> UnstressedOnset { get; set; } = new Counter<Run>();
 
         /// <summary>
         /// Transitions from onsets to stressed vowels
         /// e.g. PR-AE1 in [PR-AE1]-KT-IH0-S ("practice")
         /// </summary>
-        public ContinuationMap<Run> OnsetToStressed { get; set; } = new ContinuationMap<Run>();
+        public ContinuationMap<Run> OnsetToStressed { get; set; } = new();
+
         /// <summary>
         /// Transitions from onsets to unstressed vowels
         /// e.g. STR-AA0 in STR-AA0-MB-OW1-L-IY0 ("stromboli")
         /// </summary>
-        public ContinuationMap<Run> OnsetToUnstressed { get; set; } = new ContinuationMap<Run>();
+        public ContinuationMap<Run> OnsetToUnstressed { get; set; } = new();
+
         /// <summary>
         /// Transitions from unstressed vowels to intervocal sequences that precede stressed vowels
         /// e.g. AA0-MB in STR-AA0-MB-OW1-L-IY0 ("stromboli")
         /// </summary>
-        public ContinuationMap<Run> UnstressedToRising { get; set; } = new ContinuationMap<Run>();
+        public ContinuationMap<Run> UnstressedToRising { get; set; } = new();
         /// <summary>
         /// Transitions from unstressed vowels to intervocal sequences that do not precede stressed vowels.
         /// e.g. IH0-K in T-AE1-KT-IH0-K-AH0-L ("tactical")
         /// </summary>
-        public ContinuationMap<Run> UnstressedToFlat { get; set; } = new ContinuationMap<Run>();
+        public ContinuationMap<Run> UnstressedToFlat { get; set; } = new();
         /// <summary>
         /// Transitions from stressed vowels to intervocal sequences
         /// e.g. OW1-L in STR-AA0-MB-OW1-L-IY0 ("stromboli")
         /// </summary>
-        public ContinuationMap<Run> StressedToFalling { get; set; } = new ContinuationMap<Run>();
+        public ContinuationMap<Run> StressedToFalling { get; set; } = new();
         /// <summary>
         /// Transitions from intervocal sequences to stressed vowels.
         /// e.g. MB-OW1 in STR-AA0-MB-OW1-L-IY0 ("stromboli")
         /// </summary>
-        public ContinuationMap<Run> RisingToStressed { get; set; } = new ContinuationMap<Run>();
+        public ContinuationMap<Run> RisingToStressed { get; set; } = new();
         /// <summary>
         /// Transitions from intervocals that follow stressed vowels to unstressed vowels.
         /// e.g. KT-IH0 in T-AE1-KT-IH0-K-AH0-L ("tactical")
         /// </summary>
-        public ContinuationMap<Run> FallingToUnstressed { get; set; } = new ContinuationMap<Run>();
+        public ContinuationMap<Run> FallingToUnstressed { get; set; } = new();
         /// <summary>
         /// Transitions from intervocals that do not follow stressed vowels to unstressed vowels.
         /// e.g. K-AH0 in T-AE1-KT-IH0-K-AH0-L ("tactical")
         /// </summary>
-        public ContinuationMap<Run> FlatToUnstressed { get; set; } = new ContinuationMap<Run>();
+        public ContinuationMap<Run> FlatToUnstressed { get; set; } = new();
         /// <summary>
-        /// Transitions from stressed vowels to codas
+        /// Transitions from stressed vowels to codas (word-final consonant clusters).
         /// e.g. OW1-K in P-OW1-K ("poke")
         /// </summary>
-        public ContinuationMap<Run> StressedToCoda { get; set; } = new ContinuationMap<Run>();
+        public ContinuationMap<Run> StressedToCoda { get; set; } = new();
         /// <summary>
-        /// Transitions from unstressed vowels to codas
+        /// Transitions from unstressed vowels to codas (word-final consonant clusters).
         /// AH0-L in T-AE1-KT-IH0-K-AH0-L ("tactical")
         /// </summary>
-        public ContinuationMap<Run> UnstressedToCoda { get; set; } = new ContinuationMap<Run>();
+        public ContinuationMap<Run> UnstressedToCoda { get; set; } = new();
 
+        /// <summary>
+        /// Serialize the trained generator to JSON
+        /// </summary>
+        /// <returns>Resulting JSON string</returns>
+        public string ToJson()
+        {
+            return JsonSerializer.Serialize(this);
+        }
+
+        /// <summary>
+        /// Deserialize the given <paramref name="jsonString"/> into a <see cref="WordGenerator"/>.
+        /// </summary>
+        /// <param name="jsonString"></param>
+        /// <returns></returns>
+        internal static WordGenerator ImportFromJson(string jsonString)
+        {
+            return JsonSerializer.Deserialize<WordGenerator>(jsonString)
+                ?? throw new Exception("Failed to decode WordGenerator from JSON.");
+        }
+
+        /// <summary>
+        /// Analyze the word, and update the generator's counters and continuation maps
+        /// to reflect the derived statistics. Specifically, new data will be added to:
+        /// <list type="bullet">
+        /// <item><description><see cref="StressedOnset"/></description></item>
+        /// <item><description><see cref="UnstressedOnset"/></description></item>
+        /// <item><description><see cref="OnsetToStressed"/></description></item>
+        /// <item><description><see cref="OnsetToUnstressed"/></description></item>
+        /// <item><description><see cref="StressedToFalling"/></description></item>
+        /// <item><description><see cref="UnstressedToRising"/></description></item>
+        /// <item><description><see cref="UnstressedToFlat"/></description></item>
+        /// <item><description><see cref="RisingToStressed"/></description></item>
+        /// <item><description><see cref="FallingToUnstressed"/></description></item>
+        /// <item><description><see cref="FlatToUnstressed"/></description></item>
+        /// </list>
+        /// </summary>
+        /// <param name="word"></param>
+        /// <returns></returns>
         public bool LearnWord(Word word)
         {
             StressPattern? stressPattern = StressPattern.FromWord(word);
@@ -97,12 +140,12 @@ namespace NameGenerator
 
             if (stressPattern.StressedIndex == 0)
             {
-                OnsetS.Add(word.Runs[0]);
+                StressedOnset.Add(word.Runs[0]);
                 OnsetToStressed.Add(word.Runs[0], word.Runs[1]);
             }
             else
             {
-                OnsetU.Add(word.Runs[0]);
+                UnstressedOnset.Add(word.Runs[0]);
                 OnsetToUnstressed.Add(word.Runs[0], word.Runs[1]);
             }
 
@@ -151,7 +194,12 @@ namespace NameGenerator
             return new GenerationFailedException();
         }
 
-        public Word GenerateName()
+        /// <summary>
+        /// Generate a new random word based on the generator's 
+        /// <see cref="LearnWord(Word)"/> method.
+        /// </summary>
+        /// <returns></returns>
+        public Word GenerateWord()
         {
             List<Run> parts = new List<Run>();
             StressPattern? stressPattern = StressPatterns.GetRandom() ?? throw Fail();
@@ -160,12 +208,12 @@ namespace NameGenerator
             Run firstVowel;
             if (stressPattern.StressedIndex == 0)
             {
-                onset = OnsetS.GetRandom() ?? throw Fail();
+                onset = StressedOnset.GetRandom() ?? throw Fail();
                 firstVowel = OnsetToStressed.GenerateContinuation(onset) ?? throw Fail();
             }
             else
             {
-                onset = OnsetU.GetRandom() ?? throw Fail();
+                onset = UnstressedOnset.GetRandom() ?? throw Fail();
                 firstVowel = OnsetToUnstressed.GenerateContinuation(onset) ?? throw Fail();
             }
             parts.Add(onset);
