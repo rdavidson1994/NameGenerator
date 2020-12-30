@@ -4,7 +4,7 @@ namespace NameGenerator
 {
     public class ContinuationMap<T> where T : class, IStringSymbol
     {
-        private Dictionary<string, Counter<T>> Data { get; }
+        public Dictionary<string, Counter<T>> Data { get; }
         public ContinuationMap(Dictionary<string, Counter<T>> data)
         {
             this.Data = data;
