@@ -72,7 +72,7 @@ namespace NameGenerator
             {
                 Word name = TryGenerationUntilSuccessful(wordGenerator, maxTries: 10);
                 string arpabetName = name.SymbolizedRuns();
-                string ipaName = translator.TranslateArpabetToIpaXml(name.SymbolizedRuns());
+                string ipaName = translator.TranslateArpabetToIpaXml(arpabetName);
                 string spelledName = name.CreateSpelling(spellings);
                 string spelledNameCapitalized = spelledName.First().ToString().ToUpperInvariant() + spelledName.Substring(1);
 
@@ -96,7 +96,7 @@ namespace NameGenerator
                     name = wordGenerator.GenerateWord();
                     break;
                 }
-                catch (WordGenerator.GenerationFailedException)
+                catch (GenerationFailedException<Run>)
                 {
                     tries++;
                     if (tries >= maxTries)

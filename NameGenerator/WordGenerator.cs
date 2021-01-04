@@ -187,11 +187,10 @@ namespace NameGenerator
             return true;
         }
 
-        public class GenerationFailedException : Exception { }
-
-        private Exception Fail()
+        private static Exception Fail()
         {
-            return new GenerationFailedException();
+            // rdavidson todo: Stop it
+            return new GenerationFailedException<Run>("Generation failed.", null!);
         }
 
         /// <summary>

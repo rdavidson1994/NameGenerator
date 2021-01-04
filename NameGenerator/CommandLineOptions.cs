@@ -6,7 +6,7 @@ namespace NameGenerator
     {
         [Option("model-input",
             HelpText="Input .json file for pre-trained model."
-             ,Default ="model.json"
+            //,Default ="model.json"
         )]
         public string? ModelInput { get; set; }
 
@@ -31,13 +31,13 @@ namespace NameGenerator
 
         [Option("speak",
             HelpText = "Speak generated names aloud via default audio device.",
-            Default = false
+            Default = true
         )]
         public bool Speak { get; set; }
 
         [Option("quantity",
             HelpText = "Number of names to generate.",
-            Default = 1
+            Default = 10
         )]
         public int Quantity { get; set; }
         
