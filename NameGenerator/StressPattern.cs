@@ -55,7 +55,7 @@ namespace NameGenerator
         public int Count { get; }
         public string Symbol()
         {
-            List<char> chars = new List<char>();
+            List<char> chars = new();
             for (int i = 0; i<Count; i++)
             {
                 if (i == StressedIndex)

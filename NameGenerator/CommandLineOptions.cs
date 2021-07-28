@@ -15,6 +15,11 @@ namespace NameGenerator
             Default ="model.json")]
         public string? ModelOutput { get; set; }
 
+        [Option("speech-engine",
+            HelpText = "Engine used for speech synthesis -- either `windows` or `flite`",
+            Default = "flite")]
+        public string SpeechEngine { get; set; } = null!;
+
         [Option("training-input",
             HelpText="Input .txt file for training corpus.",
             Default = @"cmu-names.txt")]
@@ -31,15 +36,25 @@ namespace NameGenerator
 
         [Option("speak",
             HelpText = "Speak generated names aloud via default audio device.",
-            Default = true
+            Default = true //false
         )]
         public bool Speak { get; set; }
 
-        [Option("quantity",
+        [Option("flat-stress",
+            HelpText = "Disables English-style lexical stress",
+            Default = false //false
+        )]
+        public bool FlatStress { get; set; }
+
+        [Option('q', "quantity",
             HelpText = "Number of names to generate.",
-            Default = 10
+            Default = 30
         )]
         public int Quantity { get; set; }
-        
+
+        [Option('w', "word-count",
+            HelpText = "Number of words to generate per name.",
+            Default = 1)]
+        public int WordCount { get; set; }
     }
 }

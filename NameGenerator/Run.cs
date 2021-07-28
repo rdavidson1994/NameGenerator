@@ -48,7 +48,7 @@ namespace NameGenerator
         /// <returns></returns>
         public static Run ReadFromPhoneList(IList<Phone> phones, ref int index)
         {
-            List<Phone> matchingPhones = new List<Phone>();
+            List<Phone> matchingPhones = new();
             if (index < 0 || index >= phones.Count)
             {
                 throw new ArgumentOutOfRangeException(nameof(index));

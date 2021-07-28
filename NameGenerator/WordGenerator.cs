@@ -1,15 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection.Metadata.Ecma335;
 using System.Text.Json;
 
 namespace NameGenerator
 {
     public class WordGenerator
     {
-    
-
         public Counter<StressPattern> StressPatterns { get; set; } = new Counter<StressPattern>();
 
         // Vowels are divided into two categories
@@ -136,17 +133,17 @@ namespace NameGenerator
                 // Or no primary stress at all
                 return false;
             }
-            StressPatterns.Add(stressPattern);
+            StressPatterns.Add(stressPattern, word.Frequency);
 
             if (stressPattern.StressedIndex == 0)
             {
-                StressedOnset.Add(word.Runs[0]);
-                OnsetToStressed.Add(word.Runs[0], word.Runs[1]);
+                StressedOnset.Add(word.Runs[0], word.Frequency);
+                OnsetToStressed.Add(word.Runs[0], word.Runs[1], word.Frequency);
             }
             else
             {
-                UnstressedOnset.Add(word.Runs[0]);
-                OnsetToUnstressed.Add(word.Runs[0], word.Runs[1]);
+                UnstressedOnset.Add(word.Runs[0], word.Frequency);
+                OnsetToUnstressed.Add(word.Runs[0], word.Runs[1], word.Frequency);
             }
 
             for (int i = 2;
@@ -158,18 +155,18 @@ namespace NameGenerator
                 Run nextVowel = word.Runs[i + 1];
                 if (previousVowel.HasPrimaryStress())
                 {
-                    StressedToFalling.Add(previousVowel, intervocal);
-                    FallingToUnstressed.Add(intervocal, nextVowel);
+                    StressedToFalling.Add(previousVowel, intervocal, word.Frequency);
+                    FallingToUnstressed.Add(intervocal, nextVowel, word.Frequency);
                 }
                 else if (nextVowel.HasPrimaryStress())
                 {
-                    UnstressedToRising.Add(previousVowel, intervocal);
-                    RisingToStressed.Add(intervocal, nextVowel);
+                    UnstressedToRising.Add(previousVowel, intervocal, word.Frequency);
+                    RisingToStressed.Add(intervocal, nextVowel, word.Frequency);
                 }
                 else
                 {
-                    UnstressedToFlat.Add(previousVowel, intervocal);
-                    FlatToUnstressed.Add(intervocal, nextVowel);
+                    UnstressedToFlat.Add(previousVowel, intervocal, word.Frequency);
+                    FlatToUnstressed.Add(intervocal, nextVowel, word.Frequency);
                 }
             }
 
@@ -178,11 +175,11 @@ namespace NameGenerator
             Run coda = word.Runs[lastIndex];
             if (lastVowel.HasPrimaryStress())
             {
-                StressedToCoda.Add(lastVowel, coda);
+                StressedToCoda.Add(lastVowel, coda, word.Frequency);
             }
             else
             {
-                UnstressedToCoda.Add(lastVowel, coda);
+                UnstressedToCoda.Add(lastVowel, coda, word.Frequency);
             }
             return true;
         }
@@ -200,7 +197,7 @@ namespace NameGenerator
         /// <returns></returns>
         public Word GenerateWord()
         {
-            List<Run> parts = new List<Run>();
+            List<Run> parts = new();
             StressPattern? stressPattern = StressPatterns.GetRandom() ?? throw Fail();
 
             Run onset;
@@ -271,7 +268,7 @@ namespace NameGenerator
             }
             parts.Add(coda);
             string text = string.Join('|', parts.Select(x => x.Symbol()));
-            return new Word(text, parts);
+            return new Word(text, parts, 1);
         }      
     }
 }

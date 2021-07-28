@@ -19,10 +19,10 @@ namespace NameGenerator
         {
             return Data.Count;
         }
-        public void Add(T start, T continuation)
+        public void Add(T start, T continuation, int count = 1)
         {
             Data.TryAdd(start.Symbol(), new Counter<T>());
-            Data[start.Symbol()].Add(continuation);
+            Data[start.Symbol()].Add(continuation, count);
         }
         public T? GenerateContinuation(T start)
         {

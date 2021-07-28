@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "NameGenerator": {
+      "commandName": "Project",
+      "commandLineArgs": "--model-input model.json"
+    }
+  }
+}

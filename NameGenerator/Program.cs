@@ -1,10 +1,12 @@
 ﻿using System;
+using System.Text.RegularExpressions;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Diagnostics;
 using CommandLine;
 using System.Text.Json;
+using System.Text;
 
 namespace NameGenerator
 {
@@ -14,6 +16,73 @@ namespace NameGenerator
         {
             Process process = Process.Start(@"NameSayer.exe", name);
             process.WaitForExit();
+        }
+
+        static void SayNameFlite(bool flatStress, params string[] arpabetNames)
+        {
+            string utterance = SanitizeArpabet(arpabetNames);
+
+            // Render all syllables equal stress for languages like Japanese
+            // (pitch accent not implemented yet)
+            if (flatStress)
+            {
+                utterance = utterance.Replace('1', '0');
+            }
+
+
+            // Surround the utterence by pauses, so the output doesn't sound abrupt.
+            utterance = "pau " + utterance + " pau";//+ " - pau";
+            string voice = "awb";// "slp";
+            double durationStretch = flatStress ? 1.0 : 1.5;
+            Process process = Process.Start(@"flite.exe",
+                $"-p \"{utterance}\" " +
+                $"-voice .\\voices\\cmu_us_{voice}.flitevox " +
+                $"-set duration_stretch={durationStretch}");
+            process.WaitForExit();
+        }
+
+        private static string SanitizeArpabet(params string[] arpabetWords)
+        {
+            StringBuilder output = new();
+            bool firstPass = true;
+            foreach (string arpabetWord in arpabetWords)
+            {
+                if (firstPass)
+                {
+                    firstPass = false;
+                }
+                else
+                {
+                    output.Append(" - ");
+                }
+                string utterance = arpabetWord
+                .Trim('|') // Discard any pipes that mark "empty" coda/onset
+                .Replace('|', ' ') // Replace other delimiters with " "
+                .Replace('-', ' ')
+                .ToLowerInvariant() // Convert to lowercase
+                .Replace('2', '0'); // Reduce secondary stress to non-stress.
+
+                // Represent nonfinal schwas with "AX" instead of "AH".
+                utterance = Regex.Replace(utterance, "ah0(?!$)", "ax0");
+
+                // Follow all vowels except the last with a syllable break (hyphen)
+                bool skippedFirstMatch = false;
+                utterance = Regex.Replace(utterance, @"(\d)", (match) =>
+                {
+                    if (skippedFirstMatch)
+                    {
+                        return match.Groups[0].Value + " - ";
+                    }
+                    else
+                    {
+                        skippedFirstMatch = true;
+                        return match.Groups[0].Value;
+                    }
+                }, RegexOptions.RightToLeft);
+
+                output.Append(utterance);
+            }
+            return output.ToString();
         }
 
         static void Main(string[] args)
@@ -70,18 +139,49 @@ namespace NameGenerator
             Console.WriteLine("Generating names:");
             for (int i = 0; i < options.Quantity; i++)
             {
-                Word name = TryGenerationUntilSuccessful(wordGenerator, maxTries: 10);
-                string arpabetName = name.SymbolizedRuns();
-                string ipaName = translator.TranslateArpabetToIpaXml(arpabetName);
-                string spelledName = name.CreateSpelling(spellings);
-                string spelledNameCapitalized = spelledName.First().ToString().ToUpperInvariant() + spelledName.Substring(1);
-
-                Console.WriteLine($"{spelledNameCapitalized}: {arpabetName}");
-                //Console.WriteLine(ipaName);
-                if (options.Speak)
+                List<string> arpabetStrings = new();
+                string spelling = "";
+                for (int j = 0; j < options.WordCount; j++)
                 {
-                    SayName(ipaName);
+                    Word word = TryGenerationUntilSuccessful(wordGenerator, maxTries: 10);
+                    string arpabetWord = word.SymbolizedRuns();
+                    arpabetStrings.Add(arpabetWord);
+                    //string ipaName = "placeholder";// translator.TranslateArpabetToIpaXml(arpabetName);
+                    string spelledName = word.CreateSpelling(spellings);
+                    if (spelling == "")
+                    {
+                        spelling = spelledName.First().ToString().ToUpperInvariant() + spelledName[1..];
+                    }
+                    else
+                    {
+                        spelling += " ";
+                        spelling += spelledName;
+                    }
+                    //string spelledNameCapitalized = spelledName.First().ToString().ToUpperInvariant() + spelledName[1..];
                 }
+                if (options.WordCount == 1)
+                {
+                    Console.WriteLine($"{spelling} - {arpabetStrings[0]}");
+                }
+                else
+                {
+                    Console.WriteLine(spelling);
+                }
+                SayNameFlite(options.FlatStress, arpabetStrings.ToArray());
+
+                //Console.WriteLine($"{spelledNameCapitalized} - {arpabetName}");
+                //if (options.Speak)
+                //{
+                //    switch (options.SpeechEngine)
+                //    {
+                //        case "flite":
+                //            SayNameFlite(options.FlatStress, arpabetName);
+                //            break;
+                //        default: // including "windows"
+                //            SayName(ipaName);
+                //            break;
+                //    }
+                //}
             }
         }
 

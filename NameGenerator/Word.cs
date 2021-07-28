@@ -7,14 +7,17 @@ namespace NameGenerator
 {
     public class Word
     {
-        public Word(string text, List<Run> runs)
+        public Word(string text, List<Run> runs, int frequency)
         {
             Text = text;
             Runs = runs;
+            Frequency = frequency;
         }
 
         public string Text { get; }
         public IReadOnlyList<Run> Runs { get; }
+        public int Frequency { get; }
+
         public string SymbolizedRuns()
         {
             IEnumerable<string> runSymbols = Runs.Select(run => run.Symbol());
@@ -27,7 +30,7 @@ namespace NameGenerator
             string primaryStressMarker = "",
             string secondaryStressMarker = "")
         {
-            List<string> outputPieces = new List<string>();
+            List<string> outputPieces = new();
             foreach (Run run in Runs)
             {
                 foreach (Phone phone in run.Phones)
@@ -48,7 +51,15 @@ namespace NameGenerator
                     }
                     // Then trim the stress annotations away
                     string trimmedSymbol = phoneSymbol.TrimEnd('0', '1', '2');
-                    if (lookupTable.TryGetValue(trimmedSymbol, out string? translatedSymbol))
+
+                    // Try the untrimmed symbol first, in case there is a special entry
+                    // for a syllable with a specific stress.
+                    if (lookupTable.TryGetValue(phoneSymbol, out string? translatedSymbol))
+                    {
+                        outputPieces.Add(translatedSymbol);
+                    }
+                    // otherwise use the trimmed version
+                    else if (lookupTable.TryGetValue(trimmedSymbol, out translatedSymbol))
                     {
                         outputPieces.Add(translatedSymbol);
                     }
@@ -60,6 +71,21 @@ namespace NameGenerator
 
             }
             return string.Join(separator, outputPieces);
+        }
+
+        private static int ReadFrequency(string dictionaryEntry)
+        {
+            if (!dictionaryEntry.StartsWith('['))
+                return 1;
+
+            var parts = dictionaryEntry.Split(']');
+            if (parts.Length < 2)
+                return 1;
+
+            var numeral = parts[0][1..];
+            if (int.TryParse(numeral, out int result))
+                return result;
+            return 1;
         }
         
         public static Word? FromDictionaryLine(string line)
@@ -74,13 +100,16 @@ namespace NameGenerator
             {
                 return null;
             }
-            List<Phone> phones = new List<Phone>();
+
+            int frequency = ReadFrequency(parts[0]);
+
+            List<Phone> phones = new();
             for (int i = 1; i < parts.Length; i++)
             {
                 phones.Add(new Phone(parts[i]));
             }
 
-            List<Run> runs = new List<Run>();
+            List<Run> runs = new();
             int phoneIndex = 0;
             while (phoneIndex < phones.Count)
             {
@@ -93,13 +122,13 @@ namespace NameGenerator
                 // (possibly empty, as in this case)
                 runs.Insert(0, new Run(new List<Phone>()));
             }
-            if (runs[runs.Count - 1].Category() != RunCategory.Consonant)
+            if (runs[^1].Category() != RunCategory.Consonant)
             {
                 // Likewise for the *last* entry
                 runs.Add(new Run(new List<Phone>()));
             }
 
-            return new Word(parts[0], runs);
+            return new Word(parts[0], runs, frequency);
         }
 
         public override bool Equals(object? obj)
