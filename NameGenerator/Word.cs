@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 
 namespace NameGenerator
@@ -12,6 +13,104 @@ namespace NameGenerator
             Text = text;
             Runs = runs;
             Frequency = frequency;
+        }
+
+        public IEnumerable<Phone> EnumeratePhones()
+        {
+            foreach (var run in Runs)
+            {
+                foreach (var phone in run.Phones)
+                {
+                    yield return phone;
+                }
+            }
+        }
+
+        // syllable breaks are represented by nulls (I'm drunk)
+        public IEnumerable<Phone?> EnumeratePhonesAndBreaks()
+        {
+            Phone? syllableBreak = null;
+            bool finalConsonant = (Runs[^1].Category() == RunCategory.Consonant);
+            int forbiddenIndex = finalConsonant ? Runs.Count - 2 : Runs.Count - 1;
+            for (int i_run = 0; i_run < forbiddenIndex; i_run++)
+            {
+                var currentRun = Runs[i_run];
+                var nextRun = Runs[i_run + 1];
+                if (currentRun.Category() == RunCategory.Vowel)
+                {
+                    foreach (Phone phone in currentRun.Phones)
+                        yield return phone;
+                    if (nextRun.Phones.Count == 1)
+                    {
+                        // If the next consonant run is just a single consonant, leave it alone as the onset
+                        yield return syllableBreak;
+                    }
+                    else
+                    {
+                        // Otherwise absorb the first consonant of the following cluster into the coda
+                        // of our own syllable.
+                        yield return nextRun.Phones[0];
+                        yield return syllableBreak;
+                        foreach (Phone phone in nextRun.Phones.Skip(1))
+                            yield return phone;
+                        i_run += 1;
+                    }
+                }
+                else
+                {
+                    foreach (Phone phone in currentRun.Phones)
+                        yield return phone;
+                }
+            }
+
+            // Finally, yield up all the phones we didn't cover earlier
+            for (int i_run = forbiddenIndex; i_run < Runs.Count; i_run++)
+            {
+                foreach (Phone phone in Runs[i_run].Phones)
+                    yield return phone;
+            }
+            //List<Phone> phones = EnumeratePhones().ToList();
+            //int len = phones.Count;
+            //bool vowelAt(int j) => j < len && phones[j].IsVowel();
+            //bool consonantAt(int j) => j < len && !phones[j].IsVowel();
+            //bool endsInConsonant() => !phones[^1].IsVowel();
+            //for (int i = 0; i < len - 1; i++)
+            //{
+            //    yield return phones[i];
+            //    // If there is a consonant cluster upcoming, move the first consonant in front of the
+            //    // syllable break to create some form of coda (and hopefully make the cluster sound less complex)
+            //    if (vowelAt(i) && consonantAt(i + 1) && consonantAt(i + 2) && )
+            //    {
+            //        yield return phones[i + 1];
+            //        yield return syllableBreak;
+            //        i += 1;
+            //    }
+            //    // Otherwise, if there is a vowel following the consonant phone, place the 
+            //    else if (vowelAt(i) && consonantAt(i + 1) && vowelAt(i + 2))
+            //    {
+            //        yield return syllableBreak;
+            //    }
+            //}
+        }
+
+        public string ToArpabet()
+        {
+            StringBuilder output = new();
+            foreach (Phone? phone in this.EnumeratePhonesAndBreaks())
+            {
+
+                if (phone is null)
+                {
+                    output.Append('-');
+                }
+                else
+                {
+                    string entry = phone.Code.ToLower();
+                    output.Append($"{entry}");
+                }
+                output.Append(' ');
+            }
+            return output.ToString();
         }
 
         public string Text { get; }

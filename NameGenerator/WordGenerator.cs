@@ -100,7 +100,7 @@ namespace NameGenerator
         /// </summary>
         /// <param name="jsonString"></param>
         /// <returns></returns>
-        internal static WordGenerator ImportFromJson(string jsonString)
+        public static WordGenerator ImportFromJson(string jsonString)
         {
             return JsonSerializer.Deserialize<WordGenerator>(jsonString)
                 ?? throw new Exception("Failed to decode WordGenerator from JSON.");
@@ -269,6 +269,66 @@ namespace NameGenerator
             parts.Add(coda);
             string text = string.Join('|', parts.Select(x => x.Symbol()));
             return new Word(text, parts, 1);
-        }      
+        }
+
+        private Word TryGenerationUntilSuccessful(int maxTries)
+        {
+            Word name;
+            int tries = 0;
+            while (true)
+            {
+                try
+                {
+                    name = GenerateWord();
+                    break;
+                }
+                catch (GenerationFailedException<Run>)
+                {
+                    tries++;
+                    if (tries >= maxTries)
+                    {
+                        // After ten failures in a row, rethrow the exception
+                        throw;
+                    }
+                }
+            }
+
+            return name;
+        }
+
+        public List<string> CreateArpabetNames(int wordCount, Dictionary<string, string> spellings)
+        {
+            List<string> arpabetStrings = new();
+            string spelling = "";
+            for (int j = 0; j < wordCount; j++)
+            {
+                Word word = TryGenerationUntilSuccessful(maxTries: 10);
+                string spelledName = word.CreateSpelling(spellings);
+                string arpabetWord = word.ToArpabet();
+                arpabetStrings.Add(arpabetWord);
+                //string ipaName = "placeholder";// translator.TranslateArpabetToIpaXml(arpabetName);
+
+                if (spelling == "")
+                {
+                    spelling = spelledName.First().ToString().ToUpperInvariant() + spelledName[1..];
+                }
+                else
+                {
+                    spelling += " ";
+                    spelling += spelledName;
+                }
+                //string spelledNameCapitalized = spelledName.First().ToString().ToUpperInvariant() + spelledName[1..];
+            }
+            if (wordCount == 1)
+            {
+                Console.WriteLine($"{spelling} - {arpabetStrings[0]}");
+            }
+            else
+            {
+                Console.WriteLine(spelling);
+            }
+
+            return arpabetStrings;
+        }
     }
 }

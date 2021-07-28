@@ -30,6 +30,8 @@ namespace NameGenerator
             }
         }
 
+        public bool IsVowel() => Category() == RunCategory.Vowel;
+
         public override bool Equals(object? obj)
         {
             return obj is Phone phone &&
