@@ -65,7 +65,7 @@ namespace name_generator_web.Pages
                 
 
                 WordGenerator wordGenerator = _cache.GetOrCreate(WORD_GENERATOR, entry => {
-                    var json = System.IO.File.ReadAllText(@"C:\Users\rdavidson\Desktop\projects\cs\NameGenerator\NameGenerator\model.json");
+                    var json = System.IO.File.ReadAllText(@"model.json");
                     return WordGenerator.ImportFromJson(json);
                 });
 
