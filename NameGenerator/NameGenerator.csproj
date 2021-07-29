@@ -12,10 +12,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\NameSayer\NameSayer.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
     <Compile Update="GenerationFailedException.cs">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Compile>
