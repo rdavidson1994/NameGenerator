@@ -38,7 +38,7 @@ namespace name_generator_web.Pages
         private readonly IWebHostEnvironment _env;
         private readonly IMemoryCache _cache;
         private const string WORD_GENERATOR = nameof(WORD_GENERATOR);
-
+        private const string JokeGuid = "33e6f70a-480e-415a-a37b-4cf0c1915656";
 
         public IndexModel(ILogger<IndexModel> logger, IWebHostEnvironment env, IMemoryCache cache)
         {
@@ -74,6 +74,11 @@ namespace name_generator_web.Pages
                 //{
                 //    wordGenerator.LearnWord(word);
                 //}
+                if (Quantity < 0 || Quantity > 99)
+                {
+                    GeneratedNames.Add(new NameData("No.", "", Guid.Parse(JokeGuid)));
+                    Quantity = 0;
+                }
 
                 for (int i = 0; i < Quantity; i++)
                 {
