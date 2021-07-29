@@ -103,6 +103,21 @@ namespace name_generator_web.Pages
                     System.IO.File.WriteAllText($"transcriptions/{guid}.txt", arpabet);
                     GeneratedNames.Add(new NameData(spelling, transcriptionText, guid));
                 }
+
+                string[] files = Directory.GetFiles("transcriptions");
+
+                foreach (string file in files)
+                {
+                    // Delete transcription files older than 1 hour, except the funny one.
+                    FileInfo fi = new FileInfo(file);
+                    if (
+                        fi.LastAccessTime < DateTime.Now.AddHours(-1)
+                        && !fi.Name.Contains(JokeGuid)
+                    )
+                    {
+                        fi.Delete();
+                    }
+                }
             });
             return Page();
         }
