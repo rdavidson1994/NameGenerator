@@ -1,8 +1,11 @@
 {
   "profiles": {
     "NameGenerator": {
+      "commandName": "Project"
+    },
+    "NameGeneratorSentence": {
       "commandName": "Project",
-      "commandLineArgs": "--model-input model.json"
+      "commandLineArgs": "--word-count=4"
     }
   }
 }

@@ -177,8 +177,8 @@ namespace NameGenerator
                 string voiceAew = ".\\voices\\cmu_us_aew.flitevox"; // good with stretch = 0.8
 
 
-                string voice = voiceAew;
-                SayUtteranceFlite(joined, voice, durationStretch*0.8);
+                string voice = voiceAwb;
+                SayUtteranceFlite(joined, voice, durationStretch);
                 //SayWordsFlite(options.FlatStress,)
             }
         }

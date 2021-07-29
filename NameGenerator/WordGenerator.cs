@@ -271,7 +271,7 @@ namespace NameGenerator
             return new Word(text, parts, 1);
         }
 
-        private Word TryGenerationUntilSuccessful(int maxTries)
+        public Word TryGenerationUntilSuccessful(int maxTries)
         {
             Word name;
             int tries = 0;

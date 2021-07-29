@@ -34,8 +34,8 @@ namespace NameGenerator
             }
             else
             {
-                // Word has no stressed index - also not allowed
-                return null;
+                // Word has no stressed index, which we signal with -1
+                return new StressPattern(-1, vowelIndex);
             }
         }
         public StressPattern(int stressedIndex, int count)
@@ -43,7 +43,7 @@ namespace NameGenerator
             if (count <= stressedIndex) {
                 throw new ArgumentOutOfRangeException(nameof(count));
             }
-            if (stressedIndex < 0)
+            if (stressedIndex < -1)
             {
                 throw new ArgumentOutOfRangeException(nameof(stressedIndex));
             }

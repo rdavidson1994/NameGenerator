@@ -6,7 +6,6 @@ namespace NameGenerator
     {
         [Option("model-input",
             HelpText="Input .json file for pre-trained model."
-            //,Default ="model.json"
         )]
         public string? ModelInput { get; set; }
 
