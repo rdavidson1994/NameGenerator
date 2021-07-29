@@ -95,22 +95,27 @@ namespace NameGenerator
 
         public string ToArpabet()
         {
-            StringBuilder output = new();
+            List<string> output = new();
             foreach (Phone? phone in this.EnumeratePhonesAndBreaks())
             {
-
                 if (phone is null)
                 {
-                    output.Append('-');
+                    output.Add("-");
                 }
                 else
                 {
                     string entry = phone.Code.ToLower();
-                    output.Append($"{entry}");
+                    output.Add($"{entry}");
                 }
-                output.Append(' ');
             }
-            return output.ToString();
+            if (output[^1] == "ah0")
+            {
+                // Flite seems to pronounce final schwa syllables oddly unless we use this workaround
+                output[^1] = "ax0";
+                output.Add("pau");
+            }
+
+            return string.Join(' ', output);
         }
 
         public string Text { get; }
