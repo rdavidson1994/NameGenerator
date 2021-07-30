@@ -1,6 +1,6 @@
 $ErrorActionPreference = "Stop"
 dotnet publish --configuration Release
-Compress-Archive -Path "bin\Release\net5.0\publish\" -DestinationPath "name_generator.zip" -Update
+Compress-Archive -Path "bin\Release\net5.0\publish\*" -DestinationPath "name_generator.zip" -Update
 $remoteSession = New-Ec2Session.ps1
 # Invoke-Command -Session $remoteSession { iisreset.exe /stop }
 Invoke-Command -Session $remoteSession { Stop-IISSite "name_generator" }
