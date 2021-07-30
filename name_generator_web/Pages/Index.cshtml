@@ -1,22 +1,10 @@
 ﻿@page
 @model IndexModel
 @{
-    ViewData["Title"] = "Home page";
+    ViewData["Title"] = "Name Generator";
 }
 @section Scripts {
 <script>
-    // Silly hack for dark-mode bootstrap.
-    // Eventually I should use real theming.
-    for (const body of document.getElementsByTagName("body")) {
-        body.classList.add("bg-dark");
-        body.classList.add("text-white");
-        for (const element of body.getElementsByTagName('*')) {
-            element.classList.add("bg-dark");
-            element.classList.add("text-white");
-        }
-    }
-
-
     document.querySelectorAll("#js-name-list .js-play-button").forEach((playButton) => {
         playButton.addEventListener("click", () => {
             let voice = playButton.dataset.voiceString;
