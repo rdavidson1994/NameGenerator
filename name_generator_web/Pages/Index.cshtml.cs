@@ -19,11 +19,11 @@ namespace name_generator_web.Pages
         IPA,
         Arpabet
     }
-    public record NameData(string Spelling, string Transcription, Guid Id);
+    public record NameData(string Spelling, string Ipa, string Arpabet, Guid Id);
     public class IndexModel : PageModel
     {
         [BindProperty]
-        public int Quantity { get; set; }
+        public int Quantity { get; set; } = 6;
 
         [BindProperty]
         public TranscriptionKind Transcription { get; set; }
@@ -76,7 +76,7 @@ namespace name_generator_web.Pages
                 //}
                 if (Quantity < 0 || Quantity > 99)
                 {
-                    GeneratedNames.Add(new NameData("No.", "", Guid.Parse(JokeGuid)));
+                    GeneratedNames.Add(new NameData("No.", "","", Guid.Parse(JokeGuid)));
                     Quantity = 0;
                 }
 
@@ -88,20 +88,11 @@ namespace name_generator_web.Pages
                     var ipa = word.CreateSpelling(ipaLookup);
                     var arpabet = word.ToArpabet();
 
-                    string transcriptionText;
-                    if (Transcription == TranscriptionKind.IPA)
-                    {
-                        transcriptionText = ipa;
-                    }
-                    else
-                    {
-                        transcriptionText = arpabet;
-                    }
                     Guid guid = Guid.NewGuid();
                     // TODO - use a real database you dork
                     Directory.CreateDirectory("transcriptions");
                     System.IO.File.WriteAllText($"transcriptions/{guid}.txt", arpabet);
-                    GeneratedNames.Add(new NameData(spelling, transcriptionText, guid));
+                    GeneratedNames.Add(new NameData(spelling, ipa, arpabet, guid));
                 }
 
                 string[] files = Directory.GetFiles("transcriptions");
@@ -109,7 +100,7 @@ namespace name_generator_web.Pages
                 foreach (string file in files)
                 {
                     // Delete transcription files older than 1 hour, except the funny one.
-                    FileInfo fi = new FileInfo(file);
+                    FileInfo fi = new(file);
                     if (
                         fi.LastAccessTime < DateTime.Now.AddHours(-1)
                         && !fi.Name.Contains(JokeGuid)

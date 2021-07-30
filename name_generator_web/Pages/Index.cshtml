@@ -17,64 +17,64 @@
 </script>
 }
 
-<div class="text-center text-monospace">
+<div class="text-center @*text-monospace*@">
     <h1 class="display-4 text-mono">Name Generator</h1>
+        <form method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
-    <form method="post">
-        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
+            <div class="form-group row ">
 
-        <div class="form-group row ">
+                <span asp-validation-for="Quantity" class="text-danger"></span>
+                <label asp-for="Quantity" class="col-form-label"></label>
+                <div class="col-sm-1">
+                    <input class="form-control"
+                           asp-for="Quantity" />
+                </div>
 
-            <span asp-validation-for="Quantity" class="text-danger"></span>
-            <label asp-for="Quantity" class="col-form-label"></label>
-            <div class="col-sm-1">
-                <input class="form-control"
-                       asp-for="Quantity"
-                       value="6" />
+                <label asp-for="Transcription" class="col-form-label"></label>
+                <div class="col-sm-3">
+                    <select class="form-control"
+                            asp-for="Transcription"
+                            asp-items="Html.GetEnumSelectList<TranscriptionKind>()">
+                    </select>
+                </div>
+
+                <label asp-for="Voice" class="col-form-label"></label>
+                <div class="col-sm-2">
+                    <select class="form-control"
+                            asp-for="Voice"
+                            asp-items="Html.GetEnumSelectList<FliteVoice>()">
+                    </select>
+                </div>
+
+                <div class="col-sm-3">
+                    <button type="submit" class="btn btn-primary btn-block">Create</button>
+                </div>
             </div>
 
-            <label asp-for="Transcription" class="col-form-label"></label>
-            <div class="col-sm-3">
-                <select class="form-control"
-                        asp-for="Transcription"
-                        asp-items="Html.GetEnumSelectList<TranscriptionKind>()">
-                </select>
-            </div>
-
-            <label asp-for="Voice" class="col-form-label"></label>
-            <div class="col-sm-2">
-                <select class="form-control"
-                        asp-for="Voice"
-                        asp-items="Html.GetEnumSelectList<FliteVoice>()">
-                </select>
-            </div>
-
-            <div class="col-sm-3">
-                <button type="submit" class="btn btn-primary btn-block">Create</button>
-            </div>
-        </div>
-            
 
 
-    </form>
+        </form>
 
     @if (Model.GeneratedNames.Count != 0)
     {
-        <div class="card-columns" id="js-name-list">
-            @foreach (NameData name in Model.GeneratedNames)
-            {
-                var voiceString = Enum.GetName(Model.Voice);
-                <div class="card">
-                    <h5 class="card-header">@name.Spelling</h5>
-                    <div class="card-body">
-                        <h6 class="card-title">@name.Transcription</h6>
-                        <a class="btn btn-outline-primary js-play-button" data-voice-string="@voiceString" data-name-id="@name.Id">
-                            Play
-                        </a>
+            <div class="card-columns" id="js-name-list">
+                @foreach (NameData name in Model.GeneratedNames)
+                {
+                    var voiceString = Enum.GetName(Model.Voice);
+                    <div class="card">
+                        <h5 class="card-header">@name.Spelling</h5>
+                        <div class="card-body">
+                            <h6 class="card-title font-weight-normal js-ipa-text">/@name.Ipa/</h6>
+                            <h6 class="card-title text-body js-arpabet-text">@name.Arpabet</h6>
+                            <a class="btn btn-outline-primary js-play-button" data-voice-string="@voiceString" data-name-id="@name.Id">
+                                Play
+                            </a>
+                        </div>
                     </div>
-                </div>
-            }
-        </div>
+                }
+            </div>
     }
+
 </div>
