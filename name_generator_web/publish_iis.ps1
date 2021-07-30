@@ -1,8 +1,11 @@
 $ErrorActionPreference = "Stop"
 dotnet publish --configuration Release
-$publishDir = "$PSScriptRoot\bin\Release\net5.0\publish\"
+Compress-Archive -Path "bin\Release\net5.0\publish\" -DestinationPath "name_generator.zip" -Update
 $remoteSession = New-Ec2Session.ps1
-Invoke-Command -Session $remoteSession { Stop-IISSite -Name "name_generator" }
-Copy-Item -Recurse -Force -Path "$publishDir\*" -ToSession $remoteSession -Destination "C:\Users\admin\Desktop\Sitepath"
-Invoke-Command -Session $remoteSession { Start-IISSite -Name "name_generator" }
+# Invoke-Command -Session $remoteSession { iisreset.exe /stop }
+Invoke-Command -Session $remoteSession { Stop-IISSite "name_generator" }
+Copy-Item -Recurse -Force -Path "name_generator.zip" -ToSession $remoteSession -Destination "C:\Users\Administrator\Desktop\name_generator.zip"
+Invoke-Command -Session $remoteSession { Expand-Archive -LiteralPath "C:\Users\Administrator\Desktop\name_generator.zip" -DestinationPath "C:\Users\Administrator\Desktop\Sitepath"  }
+# Invoke-Command -Session $remoteSession { iisreset.exe /start }
+Invoke-Command -Session $remoteSession { Start-IISSite "name_generator" }
 Remove-PSSession $remoteSession
