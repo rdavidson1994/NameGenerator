@@ -105,16 +105,17 @@ namespace NameGenerator
                 else
                 {
                     string entry = phone.Code.ToLower();
-                    output.Add($"{entry}");
+                    // represent schwas by ax0, not ah0
+                    if (entry == "ah0")
+                    {
+                        output.Add("ax0");
+                    }
+                    else
+                    {
+                        output.Add($"{entry}");
+                    }
                 }
             }
-            if (output[^1] == "ah0")
-            {
-                // Flite seems to pronounce final schwa syllables oddly unless we use this workaround
-                output[^1] = "ax0";
-                output.Add("pau");
-            }
-
             return string.Join(' ', output);
         }
 

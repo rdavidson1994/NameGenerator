@@ -42,7 +42,7 @@ namespace name_generator_web
         {
             if (voiceIndex < 0 || voiceIndex >= VoiceFileNames.Count)
             {
-                throw new ArgumentException($"{voiceIndex} is out of bounds.");
+                throw new ArgumentException($"Selected voice {voiceIndex} is out of bounds.");
             }
             string voiceFile = VoiceFileNames[voiceIndex];
             Directory.CreateDirectory("audios");
