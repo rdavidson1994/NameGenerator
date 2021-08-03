@@ -1,4 +1,5 @@
 bin/
+!flite/bin
 .vs/
 obj/
 *.user
