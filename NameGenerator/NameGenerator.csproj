@@ -8,8 +8,62 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Include="..\flite\bin\cmu_us_aew.flitevox" Link="cmu_us_aew.flitevox">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\flite\bin\cmu_us_ahw.flitevox" Link="cmu_us_ahw.flitevox">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\flite\bin\cmu_us_aup.flitevox" Link="cmu_us_aup.flitevox" >
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\flite\bin\cmu_us_awb.flitevox" Link="cmu_us_awb.flitevox" >
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\flite\bin\cmu_us_axb.flitevox" Link="cmu_us_axb.flitevox" >
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\flite\bin\cmu_us_bdl.flitevox" Link="cmu_us_bdl.flitevox" >
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\flite\bin\cmu_us_clb.flitevox" Link="cmu_us_clb.flitevox" >
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\flite\bin\cmu_us_eey.flitevox" Link="cmu_us_eey.flitevox" >
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\flite\bin\cmu_us_fem.flitevox" Link="cmu_us_fem.flitevox" >
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\flite\bin\cmu_us_gka.flitevox" Link="cmu_us_gka.flitevox" >
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\flite\bin\cmu_us_jmk.flitevox" Link="cmu_us_jmk.flitevox" >
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\flite\bin\cmu_us_ksp.flitevox" Link="cmu_us_ksp.flitevox" >
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\flite\bin\cmu_us_ljm.flitevox" Link="cmu_us_ljm.flitevox" >
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\flite\bin\cmu_us_lnh.flitevox" Link="cmu_us_lnh.flitevox" >
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\flite\bin\cmu_us_rms.flitevox" Link="cmu_us_rms.flitevox" >
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\flite\bin\cmu_us_rxr.flitevox" Link="cmu_us_rxr.flitevox" >
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\flite\bin\cmu_us_slp.flitevox" Link="cmu_us_slp.flitevox" >
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\flite\bin\cmu_us_slt.flitevox" Link="cmu_us_slt.flitevox" >
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="..\flite\bin\flite.exe" Link="flite.exe">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
 
