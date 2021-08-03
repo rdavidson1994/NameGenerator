@@ -1,0 +1,3 @@
+The files in this directory (other than this file) were taken from or created using the Flite program, which is generously licensed as free software by Carnegie Mellon University. Please see the included "COPYING" file for the full license terms.
+
+In accordance with that license, please note that the flite.exe file in this folder was generated using a modified version of the Flite source code. The modifications I have made to it are intended extend its command line parsing.
