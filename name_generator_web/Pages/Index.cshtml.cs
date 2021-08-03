@@ -36,6 +36,10 @@ namespace name_generator_web.Pages
         public int Quantity { get; set; } = 6;
 
         [BindProperty]
+        // Index 0 gives us the AEW voice by default, which is quite nice.
+        public int SelectedVoiceIndex { get; set; } = 0;
+
+        [BindProperty]
         public TranscriptionKind Transcription { get; set; }
 
         [BindProperty]

@@ -19,39 +19,40 @@
 
 <div class="text-center @*text-monospace*@">
     <h1 class="display-4 text-mono">Name Generator</h1>
-
-    @if (Model.GeneratedNames.Count != 0)
-    {
-        <div class="row">
-            <div class="card-columns col-8" id="js-name-list">
-                @foreach (NameData name in Model.GeneratedNames)
-                {
-                    <div class="card">
-                        <h5 class="card-header">@name.Spelling</h5>
-                        <div class="card-body">
-                            <h6 class="card-title font-weight-normal js-ipa-text">/@name.Ipa/</h6>
-                            <h6 class="card-title text-body js-arpabet-text">@name.Arpabet</h6>
-                            <a class="btn btn-outline-primary js-play-button card-link" data-name-id="@name.Id">
-                                Play
-                            </a>
+    <form method="post">
+        @if (Model.GeneratedNames.Count != 0)
+        {
+            <div class="row">
+                <div class="card-columns col-8" id="js-name-list">
+                    @foreach (NameData name in Model.GeneratedNames)
+                    {
+                        <div class="card">
+                            <h5 class="card-header">@name.Spelling</h5>
+                            <div class="card-body">
+                                <h6 class="card-title font-weight-normal js-ipa-text">/@name.Ipa/</h6>
+                                <h6 class="card-title text-body js-arpabet-text">@name.Arpabet</h6>
+                                <a class="btn btn-outline-primary js-play-button card-link" data-name-id="@name.Id">
+                                    Play
+                                </a>
+                            </div>
                         </div>
-                    </div>
-                }
+                    }
+                </div>
+
+                <div class="form-group col-4">
+                    <label for="js-voice-selection">Voice</label>
+
+                    <select class="form-control" asp-for="SelectedVoiceIndex" id="js-voice-selection"
+                            asp-items="IndexModel.VoiceOptions">
+                    </select>
+                </div>
             </div>
+        }
 
-            <div class="form-group col-4">
-                <label for="js-voice-selection">Voice</label>
+        <div class="form-group">
 
-                <select class="form-control" id="js-voice-selection"
-                        asp-items="IndexModel.VoiceOptions">
-                </select>
-            </div>
-        </div>
-    }
-
-    <div class="form-group">
-        <form method="post">
             <button type="submit" class="btn btn-primary btn-block">Create</button>
-        </form>
-    </div>
+
+        </div>
+    </form>
 </div>
