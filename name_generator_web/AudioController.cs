@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Reflection;
 
 namespace name_generator_web
 {
@@ -49,7 +50,10 @@ namespace name_generator_web
                 string utterance = await System.IO.File.ReadAllTextAsync(arpabetPath);
                 await Task.Run(() =>
                 {
-                    Process process = Process.Start(@"flite",
+                    Assembly executingAssembly = Assembly.GetExecutingAssembly();
+                    string binDir = Path.GetDirectoryName(executingAssembly.Location);
+                    string flitePath = Path.Join(binDir, "flite.exe");
+                    Process process = Process.Start(flitePath,
                         $"-p \"{utterance}\" " +
                         $"-voice {voiceArg} " +
                         $"-o {audioPath}");
