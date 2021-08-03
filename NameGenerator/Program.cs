@@ -170,11 +170,8 @@ namespace NameGenerator
                 Console.WriteLine(joined);
                 //joined = joined.Replace("ah0", "ax0");
                 double durationStretch = options.FlatStress ? 1.0 : 1.5;
-                string voiceLnh = ".\\voices\\cmu_us_lnh.flitevox";
-                string voiceSlt = ".\\voices\\cmu_us_slt.flitevox";
+
                 string voiceAwb = ".\\voices\\cmu_us_awb.flitevox";
-                string voiceRms = ".\\voices\\cmu_us_awb.flitevox";
-                string voiceAew = ".\\voices\\cmu_us_aew.flitevox"; // good with stretch = 0.8
 
 
                 string voice = voiceAwb;
