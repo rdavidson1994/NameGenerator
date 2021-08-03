@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using NameGenerator;
@@ -22,14 +23,20 @@ namespace name_generator_web.Pages
     public record NameData(string Spelling, string Ipa, string Arpabet, Guid Id);
     public class IndexModel : PageModel
     {
+
+        public static List<SelectListItem> VoiceOptions = AudioController.VoiceFileNames.Select((name, index) =>
+            new SelectListItem()
+            {
+                Value = index.ToString(),
+                Text = name
+            }
+        ).ToList();
+
         [BindProperty]
         public int Quantity { get; set; } = 6;
 
         [BindProperty]
         public TranscriptionKind Transcription { get; set; }
-
-        [BindProperty]
-        public FliteVoice Voice { get; set; }
 
         [BindProperty]
         public List<NameData> GeneratedNames { get; set; } = new();
@@ -54,17 +61,18 @@ namespace name_generator_web.Pages
 
         public async Task<IActionResult> OnPostAsync()
         {
-            
+
             await Task.Run(() =>
             {
-                
+
                 //string binPath = _env.
                 var runDir = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
                 var spellings = JsonUtils.DictionaryFromJsonFile($"{runDir}/arpabet-to-spelling.json");
                 var ipaLookup = JsonUtils.DictionaryFromJsonFile($"{runDir}/arpabet-to-ipa-pretty.json");
-                
 
-                WordGenerator wordGenerator = _cache.GetOrCreate(WORD_GENERATOR, entry => {
+
+                WordGenerator wordGenerator = _cache.GetOrCreate(WORD_GENERATOR, entry =>
+                {
                     var json = System.IO.File.ReadAllText(@"model.json");
                     return WordGenerator.ImportFromJson(json);
                 });
@@ -76,7 +84,7 @@ namespace name_generator_web.Pages
                 //}
                 if (Quantity < 0 || Quantity > 99)
                 {
-                    GeneratedNames.Add(new NameData("No.", "","", Guid.Parse(JokeGuid)));
+                    GeneratedNames.Add(new NameData("No.", "", "", Guid.Parse(JokeGuid)));
                     Quantity = 0;
                 }
 

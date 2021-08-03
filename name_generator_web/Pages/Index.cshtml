@@ -26,7 +26,6 @@
             <div class="card-columns col-8" id="js-name-list">
                 @foreach (NameData name in Model.GeneratedNames)
                 {
-                    var voiceString = Enum.GetName(Model.Voice);
                     <div class="card">
                         <h5 class="card-header">@name.Spelling</h5>
                         <div class="card-body">
@@ -44,7 +43,7 @@
                 <label for="js-voice-selection">Voice</label>
 
                 <select class="form-control" id="js-voice-selection"
-                        asp-items="Html.GetEnumSelectList<FliteVoice>()">
+                        asp-items="IndexModel.VoiceOptions">
                 </select>
             </div>
         </div>

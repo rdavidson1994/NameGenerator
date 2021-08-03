@@ -10,37 +10,43 @@ using System.Reflection;
 
 namespace name_generator_web
 {
-    public enum FliteVoice
-    {
-        AWB,
-        SLT
-    }
-
-    public static class FliteVoiceExtensions
-    {
-        public static string CommandLineArg(this FliteVoice voice)
-        {
-            return voice switch
-            {
-                FliteVoice.SLT => "slt",
-                FliteVoice.AWB => "awb",
-                _ => null
-            };
-        }
-    }
-
-
     [Route("api/audio")]
     [ApiController]
     public class AudioController : ControllerBase
     {
-        [HttpGet("{voice}/{guid}")]
-        public async Task<ActionResult> Download(FliteVoice voice, Guid guid)
+        public static List<string> VoiceFileNames { get; } = new()
         {
-            string voiceArg = voice.CommandLineArg();
+            "cmu_us_aew.flitevox",
+            "cmu_us_ahw.flitevox",
+            "cmu_us_aup.flitevox",
+            "cmu_us_awb.flitevox",
+            "cmu_us_axb.flitevox",
+            "cmu_us_bdl.flitevox",
+            "cmu_us_clb.flitevox",
+            "cmu_us_eey.flitevox",
+            "cmu_us_fem.flitevox",
+            "cmu_us_gka.flitevox",
+            "cmu_us_jmk.flitevox",
+            "cmu_us_ksp.flitevox",
+            "cmu_us_ljm.flitevox",
+            "cmu_us_lnh.flitevox",
+            "cmu_us_rms.flitevox",
+            "cmu_us_rxr.flitevox",
+            "cmu_us_slp.flitevox",
+            "cmu_us_slt.flitevox"
+        };
 
+
+        [HttpGet("{voiceIndex}/{guid}")]
+        public async Task<ActionResult> Download(int voiceIndex, Guid guid)
+        {
+            if (voiceIndex < 0 || voiceIndex >= VoiceFileNames.Count)
+            {
+                throw new ArgumentException($"{voiceIndex} is out of bounds.");
+            }
+            string voiceFile = VoiceFileNames[voiceIndex];
             Directory.CreateDirectory("audios");
-            string audioPath = $"audios/{voiceArg}-{guid}.mp3";
+            string audioPath = $"audios/{voiceFile}-{guid}.mp3";
             string arpabetPath = $"transcriptions/{guid}.txt";
             if (!System.IO.File.Exists(audioPath))
             {
@@ -53,9 +59,10 @@ namespace name_generator_web
                     Assembly executingAssembly = Assembly.GetExecutingAssembly();
                     string binDir = Path.GetDirectoryName(executingAssembly.Location);
                     string flitePath = Path.Join(binDir, "flite.exe");
+                    string voicePath = Path.Join(binDir, voiceFile);
                     Process process = Process.Start(flitePath,
                         $"-p \"{utterance}\" " +
-                        $"-voice {voiceArg} " +
+                        $"-voice {voicePath} " +
                         $"-o {audioPath}");
                     process.WaitForExit();
                 });
