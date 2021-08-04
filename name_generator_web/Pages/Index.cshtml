@@ -5,13 +5,25 @@
 }
 @section Scripts {
     <script>
+        function getAudioUrl(element) {
+            let voice = document.getElementById("js-voice-selection").value;
+            let guid = element.dataset.nameId;
+            let audioUrl = `/api/audio/${voice}/${guid}.mp3`;
+            return audioUrl;
+        }
+
         document.querySelectorAll("#js-name-list .js-play-button").forEach((playButton) => {
             playButton.addEventListener("click", () => {
-                let voice = document.getElementById("js-voice-selection").value;
-                let guid = playButton.dataset.nameId;
-                let audioUrl = `/api/audio/${voice}/${guid}`;
+                let audioUrl = getAudioUrl(playButton);
                 let audio = new Audio(audioUrl);
                 audio.play();
+            })
+        });
+
+        document.querySelectorAll("#js-name-list .js-download-button").forEach((downloadButton) => {
+            downloadButton.addEventListener("click", () => {
+                let audioUrl = getAudioUrl(downloadButton);
+                downloadButton.href = audioUrl;
             })
         });
     </script>
@@ -31,6 +43,9 @@
                             <div class="card-body">
                                 <h6 class="card-title font-weight-normal js-ipa-text">/@name.Ipa/</h6>
                                 <h6 class="card-title text-body js-arpabet-text">@name.Arpabet</h6>
+                                <a class="btn btn-outline-primary js-download-button card-link" data-name-id="@name.Id" download="@(name.Spelling).mp3">
+                                    Download
+                                </a>
                                 <a class="btn btn-outline-primary js-play-button card-link" data-name-id="@name.Id">
                                     Play
                                 </a>

@@ -36,14 +36,15 @@ namespace name_generator_web
             "cmu_us_slt.flitevox"
         };
 
-
         [HttpGet("{voiceIndex}/{guid}")]
+        [HttpGet("{voiceIndex}/{guid}.mp3")]
         public async Task<ActionResult> Download(int voiceIndex, Guid guid)
         {
             if (voiceIndex < 0 || voiceIndex >= VoiceFileNames.Count)
             {
                 throw new ArgumentException($"Selected voice {voiceIndex} is out of bounds.");
             }
+
             string voiceFile = VoiceFileNames[voiceIndex];
             Directory.CreateDirectory("audios");
             string audioPath = $"audios/{voiceFile}-{guid}.mp3";
@@ -77,7 +78,7 @@ namespace name_generator_web
             {
                 
             }
-            return File(bytes, "audio/mpeg", $"{guid}");
+            return File(bytes, "audio/mpeg");
         }
     }
 }
