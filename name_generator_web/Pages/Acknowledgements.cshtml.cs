@@ -8,11 +8,11 @@ using Microsoft.Extensions.Logging;
 
 namespace name_generator_web.Pages
 {
-    public class PrivacyModel : PageModel
+    public class AcknowledgementsModel : PageModel
     {
-        private readonly ILogger<PrivacyModel> _logger;
+        private readonly ILogger<AcknowledgementsModel> _logger;
 
-        public PrivacyModel(ILogger<PrivacyModel> logger)
+        public AcknowledgementsModel(ILogger<AcknowledgementsModel> logger)
         {
             _logger = logger;
         }
