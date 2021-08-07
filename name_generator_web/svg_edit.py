@@ -1,10 +1,18 @@
 import re
-from rdutil import read, write
-
 # Gross regex shoggoth incoming...
 circle_finder_regex = r"(M \d+(?:\.\d+)? \d+(?:\.\d+)?(?: A(?: \d+(?:\.\d+)?){7}){4})"
 
+def read(path : str, mode : str = "r", **kwargs : str) -> str :
+    if not kwargs and mode == "r":
+        kwargs = { "encoding" : "utf-8"}
+    with open(path, mode, **kwargs) as f:
+        return f.read()
 
+def write(path: str, content : str, mode : str = "w", **kwargs : str) -> int:
+    if not kwargs and mode == "w":
+        kwargs = { "encoding" : "utf-8" }
+    with open(path, mode) as f:
+        return f.write(content)
 
 if __name__ == "__main__":
     radius_by_index = [
